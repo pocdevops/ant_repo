@@ -1,86 +1,37 @@
-<?xml version="1.0"?>
-
-<project name="fax" basedir="." default="usage">
-   <property file="build.properties"/>
-   <property name="src.dir" value="src"/>
-   <property name="web.dir" value="war"/>
-   <property name="javadoc.dir" value="doc"/>
-   <property name="build.dir" value="${web.dir}/WEB-INF/classes"/>
-   <property name="name" value="fax"/>
-
-   <path id="master-classpath">
-      <fileset dir="${web.dir}/WEB-INF/lib">
-         <include name="*.jar"/>
-      </fileset>
-   <pathelement path="${build.dir}"/>
-   </path>
-    
-   <target name="javadoc">
-      <javadoc packagenames="faxapp.*" sourcepath="${src.dir}" 
-         destdir="doc" version="true" windowtitle="Fax Application">
-
-         <doctitle><![CDATA[<h1>= Fax Application = </h1>]]></doctitle>
-         <bottom><![CDATA[Copyright © 2011. All Rights Reserved.]]></bottom>
-         <group title="util packages" packages="faxapp.util.*"/>
-         <group title="web packages" packages="faxapp.web.*"/>
-         <group title="data packages" packages="faxapp.entity.*:faxapp.dao.*"/>
-
-      </javadoc>
-   </target>
-
-   <target name="usage">
-   <echo message=""/>
-   <echo message="${name} build file"/>
-   <echo message="-----------------------------------"/>
-   <echo message=""/>
-   <echo message="Available targets are:"/>
-   <echo message=""/>
-   <echo message="deploy    --> Deploy application as directory"/>
-   <echo message="deploywar --> Deploy application as a WAR file"/>
-   <echo message=""/>
-   </target>
-
-
-   <target name="build" description="Compile main source tree java files">
-   <mkdir dir="${build.dir}"/>
-      <javac destdir="${build.dir}" source="1.5" target="1.5" debug="true"
-         deprecation="false" optimize="false" failonerror="true">
-         <src path="${src.dir}"/>
-         <classpath refid="master-classpath"/>
-      </javac>
-   </target>
-
-
-   <target name="deploy" depends="build" description="Deploy application">
-      <copy todir="${deploy.path}/${name}" 
-         preservelastmodified="true">
-         <fileset dir="${web.dir}">
-            <include name="**/*.*"/>
-         </fileset>
-      </copy>
-   </target>
-
-
-   <target name="deploywar" depends="build" description="Deploy application as a WAR file">
-      <war destfile="${name}.war" webxml="${web.dir}/WEB-INF/web.xml">
-         <fileset dir="${web.dir}">
-            <include name="**/*.*"/>
-         </fileset>
-      </war>
-      
-      <copy todir="${deploy.path}" preservelastmodified="true">
-         <fileset dir=".">
-            <include name="*.war"/>
-         </fileset>
-      </copy>
-   </target>
-    
-
-   <target name="clean" description="Clean output directories">
-      <delete>
-         <fileset dir="${build.dir}">
-            <include name="**/*.class"/>
-         </fileset>
-      </delete>
-   </target>
+<project name="hello-world-ant" basedir="." default="main">
+ 
+  <!-- Ant properties -->
+  <property name="src.dir"     value="src"/>
+  <property name="build.dir"   value="build"/>
+  <property name="classes.dir" value="${build.dir}/classes"/>
+  <property name="jar.dir"     value="${build.dir}/jar"/>
+  <property name="main-class"  value="com.eureka.HelloWorld"/>
+ 
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+  </target>
+ 
+  <target name="compile">
+    <mkdir dir="${classes.dir}"/>
+    <javac srcdir="${src.dir}" destdir="${classes.dir}"/>
+  </target>
+ 
+  <target name="jar" depends="compile">
+    <mkdir dir="${jar.dir}"/>
+    <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+      <manifest>
+        <attribute name="Main-Class" value="${main-class}"/>
+      </manifest>
+    </jar>
+  </target>
+ 
+  <target name="run" depends="jar">
+    <java jar="${jar.dir}/${ant.project.name}.jar" fork="true"/>
+  </target>
+ 
+  <target name="clean-build" depends="clean,jar"/>
+ 
+  <target name="main" depends="clean,run"/>
+ 
 </project>
+
